@@ -16,22 +16,23 @@
                         <label for="month" class="sr-only">Mois</label>
                         <select id="month" name="month" class="form-control mb-2" required>
                             <option value="">Sélectionnez un mois</option>
-                            <option value="1">Janvier</option>
-                            <option value="2">Février</option>
-                            <option value="3">Mars</option>
-                            <option value="4">Avril</option>
-                            <option value="5">Mai</option>
-                            <option value="6">Juin</option>
-                            <option value="7">Juillet</option>
-                            <option value="8">Août</option>
-                            <option value="9">Septembre</option>
-                            <option value="10">Octobre</option>
-                            <option value="11">Novembre</option>
-                            <option value="12">Décembre</option>
+                            <option value="Janvier">Janvier</option>
+                            <option value="Février">Février</option>
+                            <option value="Mars">Mars</option>
+                            <option value="Avril">Avril</option>
+                            <option value="Mai">Mai</option>
+                            <option value="Juin">Juin</option>
+                            <option value="Juillet">Juillet</option>
+                            <option value="Août">Août</option>
+                            <option value="Septembre">Septembre</option>
+                            <option value="Octobre">Octobre</option>
+                            <option value="Novembre">Novembre</option>
+                            <option value="Décembre">Décembre</option>
                         </select>
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
+                        <a href="{% url "factures" %}" type="submit" class="btn btn-info mb-2">Afficher tous</a>
                     </div>
                 </div>
             </form>
@@ -52,6 +53,8 @@
                                 <th scope="col">Date</th>
                                 <th scope="col">Utilitaire</th>
                                 <th scope="col">Mois</th>
+                                <th scope="col">Consomation</th>
+                                <th scope="col">Prix Unitaire</th>
                                 <th scope="col">Montant</th>
                                 <th scope="col">Action</th>
 
@@ -63,13 +66,16 @@
                                 <td>{{ f.date|date:"d/m/Y" }}</td>
                                 <td>{{ f.utility_type }}</td>
                                 <td>{{ f.mois }}</td>
+                                <td>{{ f.consumption }}</td>
+                                <td>{{ f.pu }}</td>
                                 <td>{{ f.montant }}</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
                                         data-id="{{ f.id }}"
-                                        data-utility_type="{{ f.utility_type }}"
-                                        data-date="{{ f.date|date:'Y-m-d' }}"
-                                        >
+                                        data-consommation="{{ f.consumption }}"
+                                        data-pu="{{ f.pu }}"
+                                        data-montant="{{ f.montant }}"
+                                    >
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <a type="submit" href="delete/{{ f.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
@@ -100,7 +106,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Modifier la Consommation</h5>
+                <h5 class="modal-title" id="editModalLabel">Modifier la Facture</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -108,21 +114,24 @@
             <form  method="post" id="editForm" action="" >
                 {% csrf_token %}
                 <div class="modal-body">
-                    <input type="hidden" name="consumption_id" id="consumptionId" value="">
+                    <input type="hidden" name="facture_id" id="facture_id" value="">
+                    
                     <div class="form-group">
-                        <label for="meter_reading">Relevé du Compteur</label>
-                        <input type="number" class="form-control" id="meter_reading" name="meter_reading" required>
+                        <label for="consommation">Consommation</label>
+                        <input type="text" class="form-control" id="consommationID" name="consommationID" required>
                     </div>
+
                     <div class="form-group">
-                        <label for="daily_consumption">Consommation Journalière</label>
-                        <input type="number" class="form-control" id="daily_consumption" name="daily_consumption" required>
+                        <label for="pu">Prix Unitaire</label>
+                        <input type="text" class="form-control" id="puID" name="puID" required>
                     </div>
-                    <div class="form-group" style="display:hidden;">
-                        <input type="hidden" name="date" id ="date" class="form-control" >
+
+                    <div class="form-group">
+                        <label for="montant">Montant</label>
+                        <input type="text" class="form-control" id="montantID" name="montantID" required>
                     </div>
 
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
                     <button type="submit" class="btn btn-primary">Sauvegarder les changements</button>
@@ -136,17 +145,22 @@
     $('#editModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         var id = button.data('id') // Extract info from data-* attributes
-        var meter_reading = button.data('meter_reading')
-        var daily_consumption = button.data('daily_consumption')
-        var date_consumption = button.data('date')
+        console.log("id:", id);
+        var consommation = button.data('consommation')
+        console.log("consommation:", consommation);
+        var pu = button.data('pu')
+        console.log("pu:", pu);
+        var montant = button.data('montant')
+        console.log("montant:", montant);
+        
     
         var modal = $(this)
-        modal.find('.modal-body #consumptionId').val(id)
-        modal.find('.modal-body #meter_reading').val(meter_reading)
-        modal.find('.modal-body #daily_consumption').val(daily_consumption)
-        modal.find('.modal-body #date').val(date_consumption)
+        modal.find('.modal-body #facture_id').val(id)
+        modal.find('.modal-body #consommationID').val(consommation)
+        modal.find('.modal-body #puID').val(pu)
+        modal.find('.modal-body #montantID').val(montant)
 
-        modal.find('#editForm').attr('action', 'modify_water/' + id+ '/');
+        modal.find('#editForm').attr('action', 'modify_facture/' + id+ '/');
     })
     </script>
     

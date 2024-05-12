@@ -31,10 +31,10 @@ class Facture(models.Model):
     mois = models.CharField(max_length=20, choices=months_CHOICES)
     annee = models.IntegerField(null=True)
     typecompteur_elec = models.CharField(max_length=20, choices=typecompt_CHOICES, blank=True, null=True)
-    consumption = models.DecimalField(max_digits=10, decimal_places=2)
-    pu = models.DecimalField(max_digits=10, decimal_places=2)
+    consumption = models.FloatField()
+    pu = models.FloatField()
     cos = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    montant = models.FloatField()
 
     def __str__(self):
         return f"{self.utility_type} - {self.date}"
