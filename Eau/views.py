@@ -17,9 +17,10 @@ from django.contrib import messages
 from django.db.models import Min, Max
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
 
 
-
+@login_required(login_url='login')
 def Home(request):
    return render(request, "index.html")
 
