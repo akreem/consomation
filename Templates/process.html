@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="section">
+    {% if process %}
+        <div class="row">
+            <div class="col-lg-12">
+                
+                <div class="card">
+                    <table class="table table-bordered border-primary">
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in process %}
+                            <tr>
+                                <td>{{ p.date }}</td>
+                                <td>{{ p.file }}</td>
+
+                                <td>
+                                    <a type="submit" href="/deleteprocess/{{ p.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Aucune donnée à afficher. Veuillez sélectionner un mois et une année pour filtrer les résultats.</p>
+            </div>
+        </div>
+    {% endif %}
+</section>
+<!-- Modal pour la modification -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Modifier la Facture</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form  method="post" id="editForm" action="" >
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="facture_id" id="facture_id" value="">
+                    
+                    <div class="form-group">
+                        <label for="consommation">Consommation</label>
+                        <input type="text" class="form-control" id="consommationID" name="consommationID" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pu">Prix Unitaire</label>
+                        <input type="text" class="form-control" id="puID" name="puID" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="montant">Montant</label>
+                        <input type="text" class="form-control" id="montantID" name="montantID" required>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Sauvegarder les changements</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id') // Extract info from data-* attributes
+        console.log("id:", id);
+        var consommation = button.data('consommation')
+        console.log("consommation:", consommation);
+        var pu = button.data('pu')
+        console.log("pu:", pu);
+        var montant = button.data('montant')
+        console.log("montant:", montant);
+        
+    
+        var modal = $(this)
+        modal.find('.modal-body #facture_id').val(id)
+        modal.find('.modal-body #consommationID').val(consommation)
+        modal.find('.modal-body #puID').val(pu)
+        modal.find('.modal-body #montantID').val(montant)
+
+        modal.find('#editForm').attr('action', 'modify_facture/' + id+ '/');
+    })
+    </script>
+    
+{% endblock %}
