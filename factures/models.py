@@ -39,3 +39,9 @@ class Facture(models.Model):
     def __str__(self):
         return f"{self.utility_type} - {self.date}"
     
+
+class Process(models.Model):
+    title = models.CharField(max_length=20)
+    date = models.DateField()
+    file = models.FileField(upload_to='P_files')
+
