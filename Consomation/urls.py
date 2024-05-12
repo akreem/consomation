@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from Eau import views
 from factures import views as fviews
+from django.conf.urls.static import static
+from . import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -81,7 +83,7 @@ urlpatterns = [
     path('delete_monthly_energy/<int:id>/', views.delete_energy_monthly, name='delete_energy_monthly'),
 
     path('show_Gas', include([
-        path('', views.show_water, name='show_Gas'),
+        path('', views.show_Gas, name='show_Gas'),
         path('modify_gas/<int:id>/', views.modify_gas, name='modify_gas'),
     ])),
     path('delete_gas/<int:id>/', views.delete_gas, name='delete_gas'),
@@ -100,11 +102,12 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('factures/', include("factures.urls")),
     path('add_process/', fviews.add_process, name='add_process'),
-    path('process/', fviews.get_process, name="get_process"),
+    path('process/', fviews.get_process, name="process"),
     path('deleteprocess/<int:pk>', fviews.delete_process, name="delete_process"),
     
 
 ]
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
 
 

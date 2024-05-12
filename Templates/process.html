@@ -24,9 +24,13 @@
                                 <td>{{ p.file }}</td>
 
                                 <td>
+                                    <a type="submit" href="{{ p.file.url }}" class="btn btn-sm btn-primary" download>
+                                        <i class="bi bi-download"></i>
+                                    </a>
                                     <a type="submit" href="/deleteprocess/{{ p.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                         <i class="bi bi-trash"></i>
                                     </a>
+                                    
                                 </td>
                             </tr>
                             {% endfor %}
