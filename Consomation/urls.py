@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from Eau import views
+from factures import views as fviews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -98,6 +99,10 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('factures/', include("factures.urls")),
+    path('add_process/', fviews.add_process, name='add_process'),
+    path('process/', fviews.get_process, name="get_process"),
+    path('deleteprocess/<int:pk>', fviews.delete_process, name="delete_process"),
+    
 
 ]
 

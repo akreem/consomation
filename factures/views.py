@@ -1,8 +1,8 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from .models import Facture
-from .forms import FactureForm
+from .models import Facture, ProcessClass
+from .forms import FactureForm, ProcessForm
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -67,6 +67,32 @@ def update_facture(request, id):
             # En cas d'erreur, rediriger avec les paramètres year et month
 
             return redirect("/factures/")
+
+@login_required(login_url='login')
+def add_process(request):
+    if request.method == 'POST':
+        form = ProcessForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            #return HttpResponseRedirect('generate_invoice', pk=form.instance.pk)
+            return HttpResponseRedirect('/process')
+
+    else:
+        form = ProcessForm()
+    return render(request, 'create_process.html', {'form': form})
+
+@login_required(login_url='login')
+def get_process(request):
+    process = ProcessClass.objects.all()
+    return render(request, 'process.html', {'process': process})
+
+@login_required(login_url='login')
+def delete_process(request,pk):
+    p = ProcessClass.objects.get(pk=pk)
+    p.delete()
+    return HttpResponseRedirect('/process/')
+
+
 
 @login_required(login_url='login')
 def generate_invoice(request, pk):

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -38,10 +39,7 @@ class Facture(models.Model):
 
     def __str__(self):
         return f"{self.utility_type} - {self.date}"
-    
 
-class Process(models.Model):
-    title = models.CharField(max_length=20)
-    date = models.DateField()
-    file = models.FileField(upload_to='P_files')
-
+class ProcessClass(models.Model):
+    date = models.DateTimeField(blank=True, null=True,auto_now=True)
+    file = models.FileField()

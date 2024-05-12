@@ -1,5 +1,5 @@
 from django import forms
-from .models import Facture
+from .models import Facture, ProcessClass
 
 class FactureForm(forms.ModelForm):
     class Meta:
@@ -30,3 +30,8 @@ class FactureForm(forms.ModelForm):
         self.fields['cos'].label = "Cos Q"
 
         self.fields['montant'].widget.attrs.update({'class': 'form-control', 'placeholder':'Montant'})
+
+class ProcessForm(forms.ModelForm):
+    class Meta:
+        model = ProcessClass
+        fields = '__all__'

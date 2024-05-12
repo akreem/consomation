@@ -221,6 +221,19 @@
             </ul>
           
           </li><!-- End Page Nav -->
+          <li >
+            <a href="#">
+             <i class="bi bi-grid"></i><span>Process</span>
+            </a>
+            <ul>
+              <li>
+                <a href="{% url "add_process" %}">
+                  <i class="bi bi-circle"></i><span>Ajouter Process</span>
+                </a>
+              </li>
+            </ul>
+          
+          </li><!-- End Page Nav -->
     
     
         </ul>
@@ -303,6 +316,11 @@
           <li>
             <a href="{% url "factures" %}">
               <i class="bi bi-grid"></i><span>Afficher Factures</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url "add_process" %}">
+              <i class="bi bi-grid"></i><span>Afficher Process</span>
             </a>
           </li>
         </ul>
