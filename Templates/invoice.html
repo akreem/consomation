@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .container {
+        max-width: 600px;
+        margin-top: 50px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .invoice-details {
+        margin-top: 20px;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    .buttons {
+        margin-top: 20px;
+        text-align: center;
+    }
+    button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none; /* Remove default border */
+        color: white; /* Text color */
+        background-color: #007bff; /* Bootstrap primary color */
+        transition: background-color 0.3s; /* Smooth transition for hover effect */
+    }
+    button:hover {
+        background-color: #0056b3; /* Darker shade for hover state */
+    }
+</style>
+<div class="container">
+    <h2>Facture</h2>
+    <div class="invoice-details">
+        <p>Type de service: {{ facture.utility_type }}</p>
+        <p>Consommation: {{ facture.consumption }} unités</p>
+        <p>Date: {{ facture.date }}</p>
+    </div>
+    <div class="buttons">
+        <button class="btn btn-success" onclick="window.print();">Imprimer</button>
+        <button class="btn btn-primary" id="export">Exporter</button>
+    </div>
+</div>
+<script>
+    document.getElementById('export').addEventListener('click', function() {
+        // Example of exporting to a CSV file
+        let data = "Type de service,Consommation,Date\n";
+        data += "{{ facture.utility_type }},{{ facture.consumption }},{{ facture.date }}\n";
+        const blob = new Blob([data], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'facture.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+</script>
+{% endblock %}

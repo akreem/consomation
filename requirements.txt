@@ -1,0 +1,9 @@
+Django==4.1;
+pymysql;
+djangorestframework;
+django-cors-headers;
+django-widget-tweaks;
+requests;
+tzdata;
+django-admin-interface;
+django-rest-passwordreset;

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Formulaire de filtrage par mois et année -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <form method="get" action="{% url 'show_Energy' %}">
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                        <label for="year" class="sr-only">Année</label>
+                        <input type="number" id="year" name="year" class="form-control mb-2" placeholder="Année" min="2000" max="2100" required>
+                    </div>
+                    <div class="col-auto">
+                        <label for="month" class="sr-only">Mois</label>
+                        <select id="month" name="month" class="form-control mb-2" required>
+                            <option value="">Sélectionnez un mois</option>
+                            <option value="1">Janvier</option>
+                            <option value="2">Février</option>
+                            <option value="3">Mars</option>
+                            <option value="4">Avril</option>
+                            <option value="5">Mai</option>
+                            <option value="6">Juin</option>
+                            <option value="7">Juillet</option>
+                            <option value="8">Août</option>
+                            <option value="9">Septembre</option>
+                            <option value="10">Octobre</option>
+                            <option value="11">Novembre</option>
+                            <option value="12">Décembre</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Section pour afficher les données mensuelles -->
+<section class="section">
+    {% if energy_consumptions %}
+
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="card-title">Consommation d'énergie pour le mois sélectionné</h3>
+                <div class="card">
+                    <table class="table table-bordered border-primary">
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Relevé du Compteur</th>
+                                <th scope="col">Consommation Journalière</th>
+                                <th scope="col">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consumption in energy_consumptions %}
+                            <tr>
+                                <td>{{ consumption.date|date:"d/m/Y" }}</td>
+                                <td>{{ consumption.meter_reading }}</td>
+                                <td>{{ consumption.daily_consumption }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
+                                        data-id="{{ consumption.id }}"
+                                        data-meter_reading="{{ consumption.meter_reading }}"
+                                        data-daily_consumption="{{ consumption.daily_consumption }}"
+                                        data-date="{{ consumption.date|date:'Y-m-d' }}"
+                                        >
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form action="{% url 'delete_energy' consumption.id %}" method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <input type="hidden" name="consumption_date" value="{{ consumption.date|date:'Y-m-d' }}">
+                                    </form>
+                                    
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="2"><strong>Consommation Mensuelle Totale</strong></td>
+                                <td><strong>{{ monthly_consumption }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Aucune donnée à afficher. Veuillez sélectionner un mois et une année pour filtrer les résultats.</p>
+            </div>
+        </div>
+    {% endif %}
+</section>
+<!-- Modal pour la modification -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Modifier la Consommation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form  method="post" id="editForm" action="" >
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="consumption_id" id="consumptionId" value="">
+                    <div class="form-group">
+                        <label for="meter_reading">Relevé du Compteur</label>
+                        <input type="number" class="form-control" id="meter_reading" name="meter_reading" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="daily_consumption">Consommation Journalière</label>
+                        <input type="number" class="form-control" id="daily_consumption" name="daily_consumption" required>
+                    </div>
+                    <div class="form-group" style="display:hidden;">
+                        <input type="hidden" name="date" id ="date" class="form-control" >
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Sauvegarder les changements</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id') // Extract info from data-* attributes
+        var meter_reading = button.data('meter_reading')
+        var daily_consumption = button.data('daily_consumption')
+        var date_consumption = button.data('date')
+    
+        var modal = $(this)
+        modal.find('.modal-body #consumptionId').val(id)
+        modal.find('.modal-body #meter_reading').val(meter_reading)
+        modal.find('.modal-body #daily_consumption').val(daily_consumption)
+        modal.find('.modal-body #date').val(date_consumption)
+
+        modal.find('#editForm').attr('action', 'modify_energy/' + id+ '/');
+    })
+    </script>
+{% endblock %}

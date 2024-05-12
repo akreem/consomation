@@ -1,0 +1,35 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section" >
+    <div class="row">
+        <div class="col-lg-9">
+
+            <h3 class="card-title">Machine MUNTERS en panne</h3>
+            <div class="card">
+                <table class="table table-bordered border-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nom machine</th>
+                            <th scope="col">Type de panne</th>                            
+     
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for machine in machines %}
+                        <tr>
+                            <td>{{ machine.nom }}</td>
+
+                            <td>{{ machine.panne }}</td>
+                        </tr>
+                        {% endfor %}
+                
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

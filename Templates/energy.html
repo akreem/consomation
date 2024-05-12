@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post" action="{% url 'add_Energy_consumption' %}">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <label for="date" class="col-sm-2 col-form-label">Date</label>
+        <div class="col-sm-10">
+            <input type="date" class="form-control" id="date" name="date" required>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="meter_reading" class="col-sm-2 col-form-label">Lecture Compteur</label>
+        <div class="col-sm-10">
+            <input type="number" class="form-control" id="meter_reading" name="meter_reading" required>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-sm-10 offset-sm-2">
+            <button type="submit" class="btn btn-primary">Valider</button>
+        </div>
+    </div>
+</form>
+
+
+{% endblock %}

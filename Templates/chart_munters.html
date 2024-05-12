@@ -1,0 +1,117 @@
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section" >
+
+    <h1 class="me-2">Consomation MUNTERS par rapport consommation général</h1>
+
+    <canvas id="muntersChart" width="700" height="200"></canvas>
+    <h1 class="ms-2">Facture MUNTERS par rapport facture général</h1>
+
+    <canvas id="factureChart" width="700" height="200"></canvas>
+    
+    <script>
+        var months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        var data = [
+            {% for item in data %}
+            {
+                month: months[{{ item.month }}] + ' {{ item.year }}',
+                elec_consumption: {{ item.elec_consumption }},
+                munters_consumption: {{ item.munters_consumption }},
+                facture_DTTC: {{ item.facture_DTTC }},
+                elec_munters_DTTC: {{ item.elec_munters_DTTC }}
+            },
+            {% endfor %}
+        ];
+    
+        // Graphique Munters / Elec
+        var muntersChart = new Chart(document.getElementById('muntersChart'), {
+            type: 'bar',
+            data: {
+                labels: data.map(function(item) {
+                    return item.month;
+                }),
+                datasets: [{
+                    label: 'Munters Consumption',
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    data: data.map(function(item) {
+                        return item.munters_consumption;
+                    })
+                },
+                {
+                    label: 'Electric Consumption',
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    data: data.map(function(item) {
+                        return item.elec_consumption;
+                    })
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Montant (DT)'  // Label pour l'axe Y
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Mois'  // Label pour l'axe X
+                        }
+                    }
+                }
+            }
+        });
+    
+        // Graphique Facture / Elec_Munters
+        var factureChart = new Chart(document.getElementById('factureChart'), {
+            type: 'bar',
+            data: {
+                labels: data.map(function(item) {
+                    return item.month;
+                }),
+                datasets: [{
+                    label: 'Facture DTTC',
+                    backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                    data: data.map(function(item) {
+                        return item.facture_DTTC;
+                    })
+                },
+                {
+                    label: 'Electric Munters DTTC',
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    data: data.map(function(item) {
+                        return item.elec_munters_DTTC;
+                    })
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Montant (DT)'  // Label pour l'axe Y
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Mois'  // Label pour l'axe X
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    
+    
+
+
+</section>
+
+{% endblock %}

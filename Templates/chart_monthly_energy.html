@@ -1,0 +1,126 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section" >
+   
+
+    <h1>Consommation Mensuelle d'electricité</h1>
+    <div class="mt-1">
+        <form id="dataForm" class="bg-light p-2 rounded" method="get" >
+            {% csrf_token %}
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-6">
+                    <label for="year">Year:</label>
+                    <input type="number" id="year" name="year" min="2000" max="2100" step="1" value="2024" class="form-control" required> 
+                </div>
+            </div>
+            <button type="submit" class="mt-2 btn btn-primary">Genérer Carte</button>
+        </form>
+    </div>
+    <div class="charts mt-4">
+        <canvas id="chart1" width="400" height="100" ></canvas>
+        <canvas id="chart2" width="400" height="100"></canvas>
+    </div>
+</section>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Récupérer les données de consommation depuis le serveur
+        function fetchConsumptionData(year) {
+            return fetch(`/get_consumption_data_energy?year=${year}`)
+                .then(response => response.json())
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Générer le graphique à barres
+        function generateBarChart(canvasId, labels, data, label) {
+            var ctx = document.getElementById(canvasId).getContext('2d');
+         
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 135, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: ' (m)'  // Label pour l'axe Y
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mois'  // Label pour l'axe X
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateBarChartOld(canvasId, labels, data, label) {
+            var ctx = document.getElementById(canvasId).getContext('2d');
+         
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: 'rgba(34, 162, 235, 0.2)',
+                        borderColor: 'rgba(34, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '(m)'  // Label pour l'axe Y
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mois'  // Label pour l'axe X
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        // Soumettre le formulaire et générer les graphiques lors de la soumission
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var year = document.getElementById('year').value;
+            fetchConsumptionData(year)
+                .then(data => {
+                    var months = data.months;
+                    var totalOld = data.total_old;
+                    var totalNew = data.total_new;
+
+                    // Générer le premier graphique
+                    generateBarChartOld('chart1', months, totalOld, 'Montant total de consommation (ancien)');
+                    generateBarChart('chart2', months, totalNew, 'Montant total de consommation (nouveau)');
+                });
+        });
+    });
+</script>
+
+    
+</section>
+
+{% endblock %}

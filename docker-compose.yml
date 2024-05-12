@@ -1,0 +1,22 @@
+version: '3'
+services:
+  web:
+    build: .
+    command: bash -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8012:8000"
+    depends_on:
+      - mysql
+      
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass123
+      - MYSQL_USER=akreem
+      - MYSQL_PASSWORD=akrampasswd
+      - MYSQL_DATABASE=akramdb
+
+
+  

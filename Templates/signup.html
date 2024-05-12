@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Sign Up</title>
+    <style>
+        body {
+            background-color: #e9ecef;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+            border-radius: 0.5rem;
+        }
+        input {
+            width:100%; 
+            border-radius: 0.5rem;
+            border: 2px solid #ced4da;
+            height: 45px; /* Increased height for better touch interaction and alignment with button */
+            padding: 10px 12px; /* Increased padding for better text visibility */
+            font-size: 16px; /* Larger font size for better readability */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus */
+        }
+        input:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 8px rgba(0,123,255,0.5); /* More pronounced focus effect */
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            height: 45px; /* Match the height of the input fields */
+            padding: 10px 12px; /* Consistent padding with input fields */
+            width: 100%; /* Full width for better visual impact */
+            font-size: 16px; /* Consistent font size with input fields */
+            border-radius: 0.5rem; /* Rounded corners to match input fields */
+            transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition for hover */
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .alert-container {
+            position: fixed;
+            top: 5rem;
+            right: 1rem;
+            width: 300px;
+            z-index: 1050;
+        }
+        .alert {
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: #f8d7da; /* Light red background for error messages */
+            color: #721c24; /* Dark red text color for contrast */
+            border-color: #f5c6cb; /* Light red border */
+        }
+        .alert-success {
+            background-color: #d4edda; /* Light green background for success messages */
+            color: #155724; /* Dark green text color for contrast */
+            border-color: #c3e6cb; /* Light green border */
+        }
+        .alert-dismissible .close {
+            color: inherit;
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Espace administrateur</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title text-center ">S'inscrire</h3>
+                        {% if messages %}
+                        <div id="message-container">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <script>
+                            setTimeout(function() {
+                                var messageContainer = document.getElementById('message-container');
+                                if (messageContainer) {
+                                    messageContainer.style.display = 'none';
+                                }
+                            }, 3000); // 3000 milliseconds = 3 seconds
+                        </script>
+                        {% endif %}
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">S'inscrire</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

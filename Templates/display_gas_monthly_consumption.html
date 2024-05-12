@@ -1,0 +1,165 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Formulaire de filtrage par  année -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <form method="get" action="{% url 'show_monthly_gas' %}">
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                        <label for="year" class="sr-only">Année</label>
+                        <input type="number" id="year" name="year" class="form-control mb-2" placeholder="Année" min="2000" max="2100" required>
+                    </div>
+                
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="section" >
+    {% if gas_monthly_consumptions %}
+
+    <div class="row">
+        <div class="col-lg-8">
+
+            <h3 class="card-title">Consommation Mensuelle du gaz </h3>
+            <div class="card">
+                <table class="table table-bordered border-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Mois</th>
+                            <th scope="col">Année</th>                            
+                            <th scope="col">Ancien Compteur </th>
+                            <th scope="col">Nouveau Compteur </th>
+                            <th scope="col">P.U</th>
+                            <th scope="col">Action</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for consumption in gas_monthly_consumptions %}
+                        <tr>
+                            <td>{{ consumption.month }}</td>
+
+                            <td>{{ consumption.year }}</td>
+                            <td>{{ consumption.old_meter }}</td>
+                            <td>{{ consumption.new_meter }}</td>
+                            <td>{{ consumption.prix_u_old }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
+                                data-id="{{ consumption.id }}"
+                                data-year="{{ consumption.year}}"
+                                data-month="{{ consumption.month}}"
+                                data-old_meter="{{ consumption.old_meter }}"
+                                data-prix_u_old="{{ consumption.prix_u_old }}"
+                                data-new_meter="{{ consumption.new_meter }}"
+                           >
+                                <i class="bi bi-pencil"></i>
+
+                        </button>
+
+                                <form action="{% url 'delete_gas_monthly' consumption.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <input type="hidden" id="year" name="year" value="{{ consumption.year}}">
+                                    <input type="hidden" id="month" name="month" value="{{ consumption.month}}">
+
+                                </form>
+
+                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-lg-12">
+            <p>Aucune donnée à afficher. Veuillez sélectionner une année pour filtrer les résultats.</p>
+        </div>
+    </div>
+{% endif %}
+</section>
+<!-- Modal pour la modification -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Modifier la Consommation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form  method="post" id="editForm" action="" >
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="consumption_id" id="consumptionId" value="">
+                    <div class="form-group">
+                        <label for="old_meter">Ancien Compteur</label>
+                        <input type="number" step="any" class="form-control" id="old_meter" name="old_meter" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prix_u_old">P.U</label>
+                        <input type="number" step="any" class="form-control" id="prix_u_old" name="prix_u_old" >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_meter">Nouveau Compteur</label>
+                        <input type="number" step="any" class="form-control" id="new_meter" name="new_meter" required>
+                    </div> 
+
+
+                    <div class="form-group" style="display:hidden;">
+                        <input type="hidden" name="year" id ="year" class="form-control" >
+                    </div>
+                    <div class="form-group" style="display:hidden;">
+                        <input type="hidden" name="month" id ="month" class="form-control" >
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Sauvegarder les changements</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id') // Extract info from data-* attributes
+        var old_meter = button.data('old_meter')
+        var new_meter = button.data('new_meter')
+        var prix_u_old = button.data('prix_u_old')
+        var month = button.data('month')
+        var year = button.data('year')
+    
+        var modal = $(this)
+        modal.find('.modal-body #consumptionId').val(id)
+        modal.find('.modal-body #old_meter').val(old_meter)
+        modal.find('.modal-body #new_meter').val(new_meter)
+        modal.find('.modal-body #prix_u_old').val(prix_u_old)
+        modal.find('.modal-body #month').val(month)
+        modal.find('.modal-body #year').val(year)
+
+        modal.find('#editForm').attr('action', 'modify_gas_monthly/' + id+ '/');
+    })
+    </script>
+    
+{% endblock %}

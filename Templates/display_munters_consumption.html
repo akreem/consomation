@@ -1,0 +1,142 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section" >
+    <div class="row">
+        <div class="col-lg-9">
+
+            <h3 class="card-title">Consommation MUNTERS par rapport compteur général </h3>
+            <div class="card">
+                <table class="table table-bordered border-primary">
+                    <thead>
+                        <tr>
+                            <th scope="col">Mois</th>
+                            <th scope="col">Année</th>                            
+                            <th scope="col">Consommation électrique </th>
+                            <th scope="col">Consommation MUNTERS</th>
+                            <th scope="col">Facture STEG DTTTC</th>
+                            <th scope="col"> Cout électricité Munters DTTTC</th>
+                            <th scope="col">Action</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for consumption in munters_consumptions %}
+                        <tr>
+                            <td>{{ consumption.month }}</td>
+
+                            <td>{{ consumption.year }}</td>
+                            <td>{{ consumption.elec_consumption }}</td>
+                            <td>{{ consumption.munters_consumption }}</td>
+                            <td>{{ consumption.facture_DTTC }}</td>
+                            <td>{{ consumption.elec_munters_DTTC }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
+                                data-id="{{ consumption.id }}"
+                                data-year="{{ consumption.year}}"
+                                data-month="{{ consumption.month}}"
+                                data-elec_consumption="{{ consumption.elec_consumption }}"
+                                data-munters_consumption="{{ consumption.munters_consumption }}"
+                                data-facture="{{consumption.facture_DTTC}}"
+                                data-elec_munters="{{consumption.elec_munters_DTTC}}">
+                                <i class="bi bi-pencil"></i>
+
+                        </button>
+
+                                <form action="{% url 'delete_munters_monthly' consumption.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <input type="hidden" id="year" name="year" value="{{ consumption.year}}">
+                                    <input type="hidden" id="month" name="month" value="{{ consumption.month}}">
+
+                                </form>
+
+                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Modifier la Consommation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form  method="post" id="editForm" action="" >
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="consumption_id" id="consumptionId" value="">
+                    <div class="form-group">
+                        <label for="elec_consumption">Conso Electricité</label>
+                        <input type="number" step="any" class="form-control" id="elec_consumption" name="elec_consumption" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="munters_consumption">Conso MUNTERS</label>
+                        <input type="number" step="any" class="form-control" id="munters_consumption" name="munters_consumption" >
+                    </div>
+                    <div class="form-group">
+                        <label for="facture_DTTC">Facture  DTTC</label>
+                        <input type="number" step="any" class="form-control" id="facture_DTTC" name="facture_DTTC" >
+                    </div>
+                    <div class="form-group">
+                        <label for="elec_munters_DTTC">Munters DTTC</label>
+                        <input type="number" step="any" class="form-control" id="elec_munters_DTTC" name="elec_munters_DTTC" >
+                    </div> 
+              
+          
+                    <div class="form-group" style="display:hidden;">
+                        <input type="hidden" name="year" id ="year" class="form-control" >
+                    </div>
+                    <div class="form-group" style="display:hidden;">
+                        <input type="hidden" name="month" id ="month" class="form-control" >
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Sauvegarder les changements</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#editModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var id = button.data('id') // Extract info from data-* attributes
+        var elec_consumption = button.data('elec_consumption')
+        var munters_consumption = button.data('munters_consumption')
+        var facture_DTTC = button.data('facture')
+        var elec_munters_DTTC = button.data('elec_munters')
+        var month = button.data('month')
+        var year = button.data('year')
+    
+        var modal = $(this)
+        modal.find('.modal-body #consumptionId').val(id)
+        modal.find('.modal-body #elec_consumption').val(elec_consumption)
+        modal.find('.modal-body #munters_consumption').val(munters_consumption)
+        modal.find('.modal-body #facture_DTTC').val(facture_DTTC)
+        modal.find('.modal-body #elec_munters_DTTC').val(elec_munters_DTTC)
+        modal.find('.modal-body #month').val(month)
+        modal.find('.modal-body #year').val(year)
+
+        modal.find('#editForm').attr('action', 'modify_munters_monthly/' + id+ '/');
+    })
+    </script>
+    
+{% endblock %}

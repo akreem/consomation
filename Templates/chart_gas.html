@@ -1,0 +1,97 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section" >
+   
+
+    <h1>Consommation Journelier du gaz</h1>
+    <div class="mt-1">
+        <form id="dataForm" class="bg-light p-2 rounded" method="post" >
+            {% csrf_token %}
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-6">
+                    <label for="month">Month:</label>
+                    <select id="month" name="month" class="form-control" required>
+                        <option value="1">Janvier</option>
+                        <option value="2">Février</option>
+                        <option value="3">Mars</option>
+                        <option value="4">Avril</option> 
+                        <option value="5">Mai</option>
+                        <option value="6">Juin</option> 
+                        <option value="7">Juillet</option>
+                        <option value="8">Aout</option> 
+                        <option value="9">Septembre</option>
+                        <option value="10">Octobre</option> 
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="year">Year:</label>
+                    <input type="number" id="year" name="year" min="2000" max="2100" step="1" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="mt-2 btn btn-primary">Générer Carte</button>
+        </form>
+    </div>
+    <canvas id="gazChart" width="700" height="280"></canvas>
+
+    <script>
+        const form = document.getElementById('dataForm');
+    
+        const canvas = document.getElementById('gazChart').getContext('2d');
+        let gazChart;
+    
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/gas_mensuel_chart/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (gazChart) {
+                    gazChart.destroy();
+                }
+                gazChart = new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Consommation journalière',
+                            data: data.daily_consumptions,
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Consommation (m³)'  // Label pour l'axe Y, ajustez l'unité si nécessaire
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Jour'  // Label pour l'axe X
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+    
+</section>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section">
+    <h1>Comparaison Annuelle de nouveau compteur </h1>
+    <div class="mt-1">
+        <form id="dataForm" class="bg-light p-2 rounded" method="post" action="{% url 'show_compare_by_years_gas' %}">
+            {% csrf_token %}
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-6">
+                    <label for="yearA">Année A:</label>
+                    <input type="number" id="yearA" name="yearA" min="2000" max="2100" step="1" value="{{ yearA }}" class="form-control" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="yearB">Année B:</label>
+                    <input type="number" id="yearB" name="yearB" min="2000" max="2100" step="1" value="{{ yearB }}" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="mt-2 btn btn-primary">Comparer</button>
+        </form>
+    </div>
+    {% if months %}
+    <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+        <canvas id="gazChart"></canvas>
+    </div>
+    <script>
+        var ctx = document.getElementById('gazChart').getContext('2d');
+        var gazChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ months|safe }},
+                datasets: [{
+                    label: 'Année {{ yearA }}',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    data: {{ totals_yearA|safe }},
+                }, {
+                    label: 'Année {{ yearB }}',
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: {{ totals_yearB|safe }},
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false
+                        },
+                        grid: {
+                            display: false
+                        },
+                        barPercentage: 1.0,
+                        categoryPercentage: 0.5,
+                        title: {
+                            display: true,
+                            text: 'Mois'  // Label pour l'axe X
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        title: {
+                            display: true,
+                            text: 'Consommation (DT)'  // Label pour l'axe Y
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    
+    {% endif %}
+</section>
+{% endblock %}

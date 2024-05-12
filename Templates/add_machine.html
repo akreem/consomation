@@ -1,0 +1,30 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="section" >
+    <form method="post" action="{% url 'add_machine' %}">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <label for="nom" class="col-sm-2 col-form-label">Nom machine</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="nom" name="nom" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="panne" class="col-sm-2 col-form-label">Type panne</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="panne" name="panne" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-sm-10 offset-sm-2">
+                <button type="submit" class="btn btn-primary">Ajouter</button>
+            </div>
+        </div>
+
+    </form> 
+</section>
+
+{% endblock %}
