@@ -5,8 +5,10 @@ from .models import Facture
 from .forms import FactureForm
 from django.shortcuts import  get_object_or_404
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required(login_url='login')
 def getall(request):
     factures = Facture.objects.all()
     # Récupérez les paramètres de l'année et du mois du formulaire
@@ -21,7 +23,7 @@ def getall(request):
 
     return render(request, 'factures.html', {'factures': factures})
 
-
+@login_required(login_url='login')
 def addnew(request):
     if request.method == 'POST':
         form = FactureForm(request.POST)
@@ -34,11 +36,13 @@ def addnew(request):
         form = FactureForm()
     return render(request, 'create_facture.html', {'form': form})
 
+@login_required(login_url='login')
 def delete_facture(request,pk):
     f = Facture.objects.get(pk=pk)
     f.delete()
     return HttpResponseRedirect('/factures/')
 
+@login_required(login_url='login')
 def update_facture(request, id):
     factures = get_object_or_404(Facture, pk=id)
     if request.method == 'POST':
@@ -64,7 +68,7 @@ def update_facture(request, id):
 
             return redirect("/factures/")
 
-
+@login_required(login_url='login')
 def generate_invoice(request, pk):
     facture = Facture.objects.get(pk=pk)
     # Logic to calculate invoice based on consumption and utility type
