@@ -4,7 +4,7 @@ from .models import Facture
 class FactureForm(forms.ModelForm):
     class Meta:
         model = Facture
-        fields = ['utility_type','typecompteur_elec','date','mois','annee','consumption','pu','cos','montant']
+        fields = ['utility_type','typecompteur_eau','date','mois','annee','consumption','pu','cos','montant']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -13,8 +13,8 @@ class FactureForm(forms.ModelForm):
         # Applying CSS classes to the fields        
         self.fields['utility_type'].widget.attrs.update({'class': 'form-control', 'placeholder':'Prenom', 'autofocus': 'autofocus'})
         self.fields['utility_type'].label = "Utilitaire"
-        self.fields['typecompteur_elec'].widget.attrs.update({'class': 'form-control', 'placeholder':'Nom'})
-        self.fields['typecompteur_elec'].label = "Type de compteur d'électricité "
+        self.fields['typecompteur_eau'].widget.attrs.update({'class': 'form-control', 'placeholder':'Nom'})
+        self.fields['typecompteur_eau'].label = "Type de compteur d'eau "
         self.fields['date'].widget.attrs.update({'class': 'form-control'})
 
         self.fields['mois'].widget.attrs.update({'class': 'form-control', 'placeholder':'Mois'})

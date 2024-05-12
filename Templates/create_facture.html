@@ -47,17 +47,17 @@
         console.log("Document ready!"); // Check if document ready event fires
         
         const utility_type = $("[name='utility_type']");
-        const typecompteur_elec = $("[name='typecompteur_elec']");
+        const typecompteur_eau = $("[name='typecompteur_eau']");
         const cos = $("[name='cos']");
         const coslabel = $("[for='id_cos']");
 
-        const typecompteur_elecLabel = $("[for='id_typecompteur_elec']");
+        const typecompteur_eauLabel = $("[for='id_typecompteur_eau']");
 
         console.log("Utility Type:", utility_type);
-        console.log("Type Compteur Elec:", typecompteur_elec);
+        console.log("Type Compteur Eau:", typecompteur_eau);
 
-        typecompteur_elecLabel.addClass('hidden');
-        typecompteur_elec.addClass('hidden');
+        typecompteur_eauLabel.addClass('hidden');
+        typecompteur_eau.addClass('hidden');
         cos.addClass('hidden');
         coslabel.addClass('hidden');
         
@@ -65,13 +65,17 @@
             console.log("Utility Type changed:", this.value);
             
             if (this.value === "electricite") {
-                typecompteur_elecLabel.removeClass('hidden');
-                typecompteur_elec.removeClass('hidden');
+                
                 cos.removeClass('hidden');
                 coslabel.removeClass('hidden');
-            } else {
-                typecompteur_elecLabel.addClass('hidden');
-                typecompteur_elec.addClass('hidden');
+            } 
+            else if (this.value === "eau") {
+                typecompteur_eauLabel.removeClass('hidden');
+                typecompteur_eau.removeClass('hidden');
+            }
+            else {
+                typecompteur_eauLabel.addClass('hidden');
+                typecompteur_eau.addClass('hidden');
                 cos.addClass('hidden');
                 coslabel.addClass('hidden');
             }

@@ -30,7 +30,7 @@ class Facture(models.Model):
     date = models.DateField()
     mois = models.CharField(max_length=20, choices=months_CHOICES)
     annee = models.IntegerField(null=True)
-    typecompteur_elec = models.CharField(max_length=20, choices=typecompt_CHOICES, blank=True, null=True)
+    typecompteur_eau = models.CharField(max_length=20, choices=typecompt_CHOICES, blank=True, null=True)
     consumption = models.FloatField()
     pu = models.FloatField()
     cos = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
