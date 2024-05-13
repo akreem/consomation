@@ -286,7 +286,14 @@ def add_Energy_consumption(request):
         last_record = EnergyConsumption.objects.filter(
             date__lt=date
         ).order_by('-date').first()
-
+        # Vérifier si le nouveau relevé de compteur est supérieur au dernier relevé de compteur
+        if last_record and meter_reading < last_record.meter_reading:
+            # Si ce n'est pas le cas, afficher un message d'erreur et rendre le formulaire à nouveau
+            messages.error(request, 'La nouvelle valeur du compteur doit être supérieure à la dernière valeur enregistrée.')
+            return render(request, "energy.html", {
+                'date': date,
+                'meter_reading': meter_reading,
+            })
         # Calculer la consommation journalière en utilisant la différence de prélèvement
         if last_record:
             daily_consumption = meter_reading - last_record.meter_reading
