@@ -99,37 +99,55 @@ def add_water_consumption(request):
 
         # Calculer la consommation journalière en utilisant la différence de prélèvement
         if last_record:
-            daily_consumption = meter_reading - last_record.meter_reading 
-        else:
-            daily_consumption = 0
+            last_daily_consumption = meter_reading - last_record.meter_reading
 
-        # Créer un nouvel objet WaterConsumption et l'enregistrer dans la base de données
-        new_record = WaterConsumption.objects.create(
+            last_record.daily_consumption = last_daily_consumption
+            last_record.save()
+
+            
+            new_record = WaterConsumption.objects.create(
             date=date_obj,
             meter_reading=meter_reading ,
-            daily_consumption=daily_consumption
-        )
+            daily_consumption= 0
+            )
+            redirect_url = reverse('show_water')
+            return redirect(redirect_url)
+
+            
+
+        else:
+            new_record = WaterConsumption.objects.create(
+            date=date_obj,
+            meter_reading=meter_reading ,
+            daily_consumption= 0
+            )
+            redirect_url = reverse('show_water')
+            return redirect(redirect_url)
+
+        # Créer un nouvel objet WaterConsumption et l'enregistrer dans la base de données
+        #new_record = WaterConsumption.objects.create(
+            #date=date_obj,
+            #meter_reading=meter_reading ,
+            #daily_consumption=daily_consumption
+        #)
 
         # Mettre à jour les enregistrements ultérieurs si nécessaire
-        subsequent_records = WaterConsumption.objects.filter(
-            date__gt=date_obj
-        ).order_by('date')
+        #subsequent_records = WaterConsumption.objects.filter(
+            #date__gt=date_obj
+        #).order_by('date')
 
-        for record in subsequent_records:
+        #for record in subsequent_records:
             # Calculer le nouveau relevé de compteur en ajoutant la consommation journalière de l'enregistrement précédent
-            meter_reading += record.daily_consumption
-            record.meter_reading = meter_reading
-            record.save()
+            #meter_reading += record.daily_consumption
+            #record.meter_reading = meter_reading
+            #record.save()
 
-        water_consumptions = WaterConsumption.objects.order_by('date')
+        #water_consumptions = WaterConsumption.objects.order_by('date')
         #redirect_url = reverse('show_water') + f'?year={date_obj.year}&month={date_obj.month}'  # Construire l'URL de redirection avec les paramètres year et month
-        redirect_url = reverse('show_water')  # Construire l'URL de redirection avec les paramètres year et month
+        
 
-
-        return redirect(redirect_url)
-
-    water_consumptions = WaterConsumption.objects.order_by('date')
-    return render(request, "Eau.html", {'water_consumptions': water_consumptions})
+    #water_consumptions = WaterConsumption.objects.order_by('date')
+    return render(request, "Eau.html")
 
 
 
@@ -187,14 +205,23 @@ def get_water(request):
 
     file_name = 'water_consumption'
     return export_to_excel(data, file_name)
-    
+
+@login_required(login_url='login')
 def show_water(request):
+    context = {}
     water_consumptions = WaterConsumption.objects.all()
+    context['water_consumptions'] = water_consumptions
 
     # Récupérez les paramètres de l'année et du mois du formulaire
     year = request.GET.get('year')
     month = request.GET.get('month')
     isfilter = None
+    context['isfilter'] = isfilter
+
+    monthly_consumption = water_consumptions.aggregate(
+        total_monthly_consumption=Sum('daily_consumption')
+    )['total_monthly_consumption'] or 0
+    context['monthly_consumption'] = monthly_consumption
     
 
     # Filtrez les données si l'année et le mois sont spécifiés
@@ -203,18 +230,20 @@ def show_water(request):
             date__year=year,
             date__month=month
         )
+        context['water_consumptions'] = water_consumptions
         isfilter = True
+        context['isfilter'] = isfilter
         
 
         # Calculez la consommation mensuelle
-        #monthly_consumption = water_consumptions.aggregate(
-            #total_monthly_consumption=Sum('daily_consumption')
-        #)['total_monthly_consumption'] or 0
-        #context['monthly_consumption'] = monthly_consumption
+        monthly_consumption = water_consumptions.aggregate(
+            total_monthly_consumption=Sum('daily_consumption')
+        )['total_monthly_consumption'] or 0
+        context['monthly_consumption'] = monthly_consumption
         
 
     # Passez les données filtrées au template
-    return render(request, "display_water_consumption.html", {'water_consumptions': water_consumptions, 'isfilter': isfilter})
+    return render(request, "display_water_consumption.html", context)
 
 
 
