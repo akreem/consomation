@@ -32,6 +32,8 @@
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
+                        {% if isfilter %}<a href="{% url "show_Gas" %}" type="submit" class="btn btn-info mb-2">Afficher tous</a>{% endif %}
+                        
                     </div>
                 </div>
             </form>
@@ -44,7 +46,7 @@
     {% if gas_consumptions %}
         <div class="row">
             <div class="col-lg-12">
-                <h3 class="card-title">Consommation d'gaz pour le mois sélectionné</h3>
+                <h3 class="card-title">{% if isfilter %}Consommation de Gaz pour le mois sélectionné {% endif %}</h3>
                 <div class="card">
                     <table class="table table-bordered border-primary">
                         <thead>
@@ -61,7 +63,7 @@
                             <tr>
                                 <td>{{ consumption.date|date:"d/m/Y" }}</td>
                                 <td>{{ consumption.meter_reading }}</td>
-                                <td>{{ consumption.daily_consumption }}</td>
+                                <td>{% if consumption.daily_consumption != 0 %}{{ consumption.daily_consumption }}{% endif %}</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
                                         data-id="{{ consumption.id }}"
@@ -83,19 +85,23 @@
                             </tr>
                             {% endfor %}
                             <tr>
-                                <td colspan="2"><strong>Consommation Mensuelle Totale</strong></td>
+                                <td colspan="2"><strong>Consommation {% if isfilter %}Mensuelle{% endif %} Totale</strong></td>
                                 <td><strong>{{ monthly_consumption }}</strong></td>
                             </tr>
                         </tbody>
                     </table>
+                    {% if not isfilter %}<a href="{% url "export_xl_gas" %}" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
                 </div>
+                
             </div>
+            
             
         </div>
     {% else %}
         <div class="row">
             <div class="col-lg-12">
-                <p>Aucune donnée à afficher. Veuillez sélectionner un mois et une année pour filtrer les résultats.</p>
+                <p>Aucune donnée à afficher.</p>
+                <!--<p>Aucune donnée à afficher. Veuillez sélectionner un mois et une année pour filtrer les résultats.</p>-->
             </div>
         </div>
     {% endif %}
@@ -154,4 +160,5 @@
         modal.find('#editForm').attr('action', 'modify_gas/' + id+ '/');
     })
     </script>
+    
 {% endblock %}

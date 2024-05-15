@@ -74,6 +74,7 @@ def export_to_excel(data,filename):
     return response
 
 
+@login_required(login_url='login')
 def add_water_consumption(request):
     if request.method == 'POST':
         # Extraire les données de la requête POST
@@ -205,6 +206,40 @@ def get_water(request):
 
     file_name = 'water_consumption'
     return export_to_excel(data, file_name)
+
+
+@login_required(login_url='login')
+def export_xl_gas(request):
+    gas_consumptions = GasConsumption.objects.all()
+    data = []
+    for p in gas_consumptions:
+        data.append({
+                'date': p.date,
+                'releve': p.meter_reading,
+                'consommation': p.daily_consumption,   
+            })
+
+    file_name = 'gaz_consumption'
+    return export_to_excel(data, file_name)
+
+    
+
+
+
+@login_required(login_url='login')
+def export_xl_energy(request):
+    energy_consumptions = EnergyConsumption.objects.all()
+    data = []
+    for p in energy_consumptions:
+        data.append({
+                'date': p.date,
+                'releve': p.meter_reading,
+                'consommation': p.daily_consumption,   
+            })
+
+    file_name = 'energy_consumption'
+    return export_to_excel(data, file_name)
+
 
 @login_required(login_url='login')
 def show_water(request):
@@ -351,6 +386,8 @@ def add_Energy_consumption(request):
         last_record = EnergyConsumption.objects.filter(
             date__lt=date
         ).order_by('-date').first()
+
+
         # Vérifier si le nouveau relevé de compteur est supérieur au dernier relevé de compteur
         if last_record and meter_reading < last_record.meter_reading:
             # Si ce n'est pas le cas, afficher un message d'erreur et rendre le formulaire à nouveau
@@ -361,29 +398,56 @@ def add_Energy_consumption(request):
             })
         # Calculer la consommation journalière en utilisant la différence de prélèvement
         if last_record:
-            daily_consumption = meter_reading - last_record.meter_reading
+            last_daily_consumption = meter_reading - last_record.meter_reading
+            last_record.daily_consumption = last_daily_consumption
+            last_record.save()
+
+            new_record = EnergyConsumption.objects.create(
+                date=date, meter_reading=meter_reading,
+                daily_consumption=0
+                )
+            redirect_url = reverse('show_Energy')
+            return redirect(redirect_url)
+
+
         else:
-            daily_consumption = 0
+            new_record = EnergyConsumption.objects.create(
+                date=date, meter_reading=meter_reading,
+                daily_consumption=0
+                )
+            redirect_url = reverse('show_Energy')
+            return redirect(redirect_url)
+
 
         # Créer un nouvel objet EnergyConsumption et l'enregistrer dans la base de données
-        EnergyConsumption.objects.create(date=date, meter_reading=meter_reading, daily_consumption=daily_consumption)
 
 
         # Construire l'URL de redirection avec les paramètres year et month
-        redirect_url = reverse('show_Energy') + f'?year={date_obj.year}&month={date_obj.month}'
+        r#edirect_url = reverse('show_Energy') + f'?year={date_obj.year}&month={date_obj.month}'
 
-        return redirect(redirect_url)
+        #return redirect(redirect_url)
 
     return render(request, "energy.html")
 
 def show_Energy(request):
     # Récupérez les paramètres de l'année et du mois du formulaire
-    year = request.GET.get('year')
-    month = request.GET.get('month')
-
-    # Initialisez la requête de base
     energy_consumptions_query = EnergyConsumption.objects.all()
     context = {}
+    context['energy_consumptions'] = energy_consumptions_query
+
+
+    year = request.GET.get('year')
+    month = request.GET.get('month')
+    isfilter = None
+    context['isfilter'] = isfilter
+
+    monthly_consumption = energy_consumptions_query.aggregate(
+            total_monthly_consumption=Sum('daily_consumption')
+        )['total_monthly_consumption'] or 0
+    context['monthly_consumption'] = monthly_consumption
+
+    # Initialisez la requête de base
+    
 
     # Filtrez les données si l'année et le mois sont spécifiés
     if year and month:
@@ -392,15 +456,15 @@ def show_Energy(request):
             date__year=year,
             date__month=month
         )
+        context['energy_consumptions'] = energy_consumptions_query
+        isfilter = True
+        context['isfilter'] = isfilter
+
         # Calculez la consommation mensuelle
         monthly_consumption = energy_consumptions_query.aggregate(
             total_monthly_consumption=Sum('daily_consumption')
         )['total_monthly_consumption'] or 0
         context['monthly_consumption'] = monthly_consumption
-        # Récupérez les données filtrées
-
-        context['energy_consumptions'] = energy_consumptions_query
-
 
     # Rendez le template avec les données
     return render(request, 'display_energy_consumption.html', context)
@@ -601,6 +665,8 @@ def show_machines(request):
     return render(request, 'show_machines.html',{'machines': machines})
 
 
+
+@login_required(login_url='login')
 def add_gas_consumption(request):
     if request.method == 'POST':
         # Extraire les données de la requête POST
@@ -626,36 +692,53 @@ def add_gas_consumption(request):
 
         # Calculer la consommation journalière en utilisant la différence de prélèvement
         if last_record:
-            daily_consumption = meter_reading - last_record.meter_reading
-        else:
-            daily_consumption = 0
+            last_daily_consumption = meter_reading - last_record.meter_reading
+            last_record.daily_consumption = last_daily_consumption
+            last_record.save()
 
-        # Créer un nouvel objet WaterConsumption et l'enregistrer dans la base de données
-        new_record = GasConsumption.objects.create(
+            new_record = GasConsumption.objects.create(
             date=date_obj,
             meter_reading=meter_reading,
-            daily_consumption=daily_consumption
-        )
+            daily_consumption = 0
+            )
+            redirect_url = reverse('show_Gas')
+            return redirect(redirect_url)
+
+
+        else:
+            new_record = GasConsumption.objects.create(
+            date=date_obj,
+            meter_reading=meter_reading,
+            daily_consumption = 0
+            )
+            redirect_url = reverse('show_Gas')
+            return redirect(redirect_url)
+
+
+            #daily_consumption = 0
+
+        # Créer un nouvel objet WaterConsumption et l'enregistrer dans la base de données
+        
 
         # Mettre à jour les enregistrements ultérieurs si nécessaire
-        subsequent_records = GasConsumption.objects.filter(
-            date__gt=date_obj
-        ).order_by('date')
+        #subsequent_records = GasConsumption.objects.filter(
+            #date__gt=date_obj
+        #).order_by('date')
 
-        for record in subsequent_records:
+        #for record in subsequent_records:
             # Calculer le nouveau relevé de compteur en ajoutant la consommation journalière de l'enregistrement précédent
-            meter_reading += record.daily_consumption
-            record.meter_reading = meter_reading
-            record.save()
+            #meter_reading += record.daily_consumption
+            #record.meter_reading = meter_reading
+            #record.save()
 
-        gas_consumptions = GasConsumption.objects.order_by('date')
-        redirect_url = reverse('show_Gas') + f'?year={date_obj.year}&month={date_obj.month}'  # Construire l'URL de redirection avec les paramètres year et month
+        #gas_consumptions = GasConsumption.objects.order_by('date')
+        #redirect_url = reverse('show_Gas') + f'?year={date_obj.year}&month={date_obj.month}'  # Construire l'URL de redirection avec les paramètres year et month
 
 
-        return redirect(redirect_url)
+        #return redirect(redirect_url)
 
-    gas_consumptions = GasConsumption.objects.order_by('date')
-    return render(request, "gas.html", {'gas_consumptions': gas_consumptions})
+    #gas_consumptions = GasConsumption.objects.order_by('date')
+    return render(request, "gas.html")
 
 
 
@@ -700,13 +783,24 @@ def show_monthly_gas(request):
         return render(request, 'display_gas_monthly_consumption.html',context)
      
 
+
+@login_required(login_url='login')
 def show_Gas(request):
     gas_consumptions = GasConsumption.objects.all()
     context = {}
+    context['gas_consumptions'] = gas_consumptions
 
     # Récupérez les paramètres de l'année et du mois du formulaire
     year = request.GET.get('year')
     month = request.GET.get('month')
+    isfilter = None
+    context['isfilter'] = isfilter
+
+    monthly_consumption = gas_consumptions.aggregate(
+            total_monthly_consumption=Sum('daily_consumption')
+    )['total_monthly_consumption'] or 0
+    context['monthly_consumption'] = monthly_consumption
+
 
     # Filtrez les données si l'année et le mois sont spécifiés
     if year and month:
@@ -715,12 +809,16 @@ def show_Gas(request):
             date__month=month
         )
         # Calculez la consommation mensuelle
-        monthly_consumption = gas_consumptions.aggregate(
+        context['gas_consumptions'] = gas_consumptions
+
+        isfilter = True
+        context['isfilter'] = isfilter
+
+        vmonthly_consumption = gas_consumptions.aggregate(
             total_monthly_consumption=Sum('daily_consumption')
         )['total_monthly_consumption'] or 0
         context['monthly_consumption'] = monthly_consumption
-        context['gas_consumptions'] = gas_consumptions
-
+        
     # Passez les données filtrées au template
     return render(request, "display_gas_consumption.html", context)
 
