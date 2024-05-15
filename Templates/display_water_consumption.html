@@ -33,7 +33,7 @@
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
                         {% if isfilter %}<a href="{% url "show_water" %}" type="submit" class="btn btn-info mb-2">Afficher tous</a>{% endif %}
-                        {% if not isfilter %}<a href="/export_water/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
+                        
                     </div>
                 </div>
             </form>
@@ -85,13 +85,16 @@
                             </tr>
                             {% endfor %}
                             <tr>
-                                <td colspan="2"><strong>Consommation Mensuelle Totale</strong></td>
+                                <td colspan="2"><strong>Consommation {% if isfilter %}Mensuelle{% endif %} Totale</strong></td>
                                 <td><strong>{{ monthly_consumption }}</strong></td>
                             </tr>
                         </tbody>
                     </table>
+                    {% if not isfilter %}<a href="/export_water/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
                 </div>
+                
             </div>
+            
             
         </div>
     {% else %}
