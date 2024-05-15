@@ -26,6 +26,7 @@ urlpatterns = [
     path('', views.signup, name="signup"),   
     path('Home', views.Home, name="Home"), 
     path('show_water/', views.show_water, name="show_water"),
+    path('export_water/', views.get_water, name="export_water"),
     path('add_water_consumption/', views.add_water_consumption, name="add_water_consumption"),
     path('show_Energy/', views.show_Energy, name="show_Energy"),
     path('add_Energy_consumption/', views.add_Energy_consumption, name="add_Energy_consumption"),

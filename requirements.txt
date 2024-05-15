@@ -7,3 +7,4 @@ requests;
 tzdata;
 django-admin-interface;
 django-rest-passwordreset;
+openpyxl;

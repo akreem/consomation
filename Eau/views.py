@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from .models import WaterConsumption,EnergyConsumption,WaterMonthlyConsumption,Munters, Machines,GasConsumption,GasMonthlyConsumption,EnergyMonthlyConsumption
 from collections import defaultdict
 from itertools import groupby
@@ -18,6 +18,7 @@ from django.db.models import Min, Max
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from openpyxl import Workbook
 
 
 @login_required(login_url='login')
@@ -53,9 +54,25 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+@login_required(login_url='login')
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+def export_to_excel(data,filename):
+    wb = Workbook()
+    ws = wb.active
+    ws.sheet_view.rightToLeft = True
+
+    ws.append(["Date","Relevé du Compteur","Consommation Journalière"])
+    for item in data:
+        ws.append([item["date"], item["releve"], item["consommation"]])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachement; filename={filename}.xlsx'
+    wb.save(response)
+    return response
+
 
 def add_water_consumption(request):
     if request.method == 'POST':
@@ -105,7 +122,8 @@ def add_water_consumption(request):
             record.save()
 
         water_consumptions = WaterConsumption.objects.order_by('date')
-        redirect_url = reverse('show_water') + f'?year={date_obj.year}&month={date_obj.month}'  # Construire l'URL de redirection avec les paramètres year et month
+        #redirect_url = reverse('show_water') + f'?year={date_obj.year}&month={date_obj.month}'  # Construire l'URL de redirection avec les paramètres year et month
+        redirect_url = reverse('show_water')  # Construire l'URL de redirection avec les paramètres year et month
 
 
         return redirect(redirect_url)
@@ -156,13 +174,28 @@ def show_monthly_water(request):
         return render(request, 'display_water_monthly_consumption.html',context)
      
 
+@login_required(login_url='login')
+def get_water(request):
+    water_consumptions = WaterConsumption.objects.all()
+    data = []
+    for p in water_consumptions:
+        data.append({
+                'date': p.date,
+                'releve': p.meter_reading,
+                'consommation': p.daily_consumption,   
+            })
+
+    file_name = 'water_consumption'
+    return export_to_excel(data, file_name)
+    
 def show_water(request):
     water_consumptions = WaterConsumption.objects.all()
-    context = {}
 
     # Récupérez les paramètres de l'année et du mois du formulaire
     year = request.GET.get('year')
     month = request.GET.get('month')
+    isfilter = None
+    
 
     # Filtrez les données si l'année et le mois sont spécifiés
     if year and month:
@@ -170,15 +203,18 @@ def show_water(request):
             date__year=year,
             date__month=month
         )
+        isfilter = True
+        
+
         # Calculez la consommation mensuelle
-        monthly_consumption = water_consumptions.aggregate(
-            total_monthly_consumption=Sum('daily_consumption')
-        )['total_monthly_consumption'] or 0
-        context['monthly_consumption'] = monthly_consumption
-        context['water_consumptions'] = water_consumptions
+        #monthly_consumption = water_consumptions.aggregate(
+            #total_monthly_consumption=Sum('daily_consumption')
+        #)['total_monthly_consumption'] or 0
+        #context['monthly_consumption'] = monthly_consumption
+        
 
     # Passez les données filtrées au template
-    return render(request, "display_water_consumption.html", context)
+    return render(request, "display_water_consumption.html", {'water_consumptions': water_consumptions, 'isfilter': isfilter})
 
 
 
