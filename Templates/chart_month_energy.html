@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Consommation Mensuelle d'electricité {% endblock %}
+{% block content %}
+<section class="section">
+    <div class="mt-1">
+        <form id="dataForm" class="bg-light p-2 rounded" method="post">
+            {% csrf_token %}
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-6">
+                    <label for="year">Année:</label>
+                    <input type="number" value=2024 id="year" name="year" min="2000" max="2100" step="1"
+                        class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="mt-2 btn btn-primary">Générer Carte</button>
+        </form>
+    </div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                {% comment %} <h5 class="card-title">Consommation Mensuelle d'electricité</h5> {% endcomment %}
+
+                <!-- Column Chart -->
+                <div id="columnChart"></div>
+                <!-- <canvas id="waterChart" width="700" height="280"></canvas> -->
+ <script>
+        const form = document.getElementById('dataForm');
+        let chart; // Variable to hold the chart instance
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const year = formData.get('year');
+
+            const apiUrl = `/api_energy_monthly_filtered/${year}/`;
+            console.log('Constructed API URL:', apiUrl);
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const dates = data.map(item => item.month);
+                    const consumptionValues = data.map(item => item.total_consumption);
+
+                    if (chart) {
+                        chart.destroy(); // Destroy the existing chart instance
+                    }
+
+                    chart = new ApexCharts(document.querySelector("#columnChart"), {
+                        series: [{
+                            name: 'Consommation Mensuelle',
+                            data: consumptionValues
+                        }],
+                        chart: {
+                            type: 'bar',
+                            height: 350
+                        },
+                        title: {
+                            text: 'Consommation Mensuelle d"electricité'
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                columnWidth: '55%',
+                                endingShape: 'rounded'
+                            },
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            show: true,
+                            width: 2,
+                            colors: ['transparent']
+                        },
+                        xaxis: {
+                            categories: dates,
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Consumption (kWh)'
+                            }
+                        },
+                        fill: {
+                            opacity: 1
+                        },
+                        tooltip: {
+                            y: {
+                                formatter: function (val) {
+                                    return val + " kWh";
+                                }
+                            }
+                        }
+                    });
+
+                    chart.render();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        });
+    </script>
+                <!-- End Column Chart -->
+
+            </div>
+        </div>
+    </div>
+
+</div>
+</section>
+
+{% endblock %}

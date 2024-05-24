@@ -10,18 +10,49 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 @login_required(login_url='login')
 def getall(request):
-    factures = Facture.objects.all()
+    factures = Facture.objects.all().order_by('-annee', 'mois').values()
     # Récupérez les paramètres de l'année et du mois du formulaire
+    month_names = {
+        1: 'Janvier', 2: 'Février', 3: 'Mars', 4: 'Avril',
+        5: 'Mai', 6: 'Juin', 7: 'Juillet', 8: 'Aout',
+        9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Décembre'
+    }
+
+    factures_with_month_names = []
+    for facture in factures:
+        facture_with_display = facture.copy()
+        facture_with_display['mois_display'] = month_names.get(facture['mois'])
+        factures_with_month_names.append(facture_with_display)
+
+    context = {}
+    context['factures'] = factures_with_month_names
+
+
     year = request.GET.get('year')
-    month = request.GET.get('month')
+    utility_type = request.GET.get('utility_type')
+
+    
+    isfilter = None
+    context['isfilter'] = isfilter
+    #context['factures'] = factures
      # Filtrez les données si l'année et le mois sont spécifiés
-    if year and month:
+    if year and utility_type:
         factures = factures.filter(
             annee=year,
-            mois=month
+            utility_type=utility_type
         )
+        factures_with_month_names1 = []
+        for facture in factures:
+            facture_with_display = facture.copy()
+            facture_with_display['mois_display'] = month_names.get(facture['mois'])
+            factures_with_month_names1.append(facture_with_display)
 
-    return render(request, 'factures.html', {'factures': factures})
+        isfilter = True
+        context['isfilter'] = isfilter
+        #context['factures'] = factures
+        context['factures'] = factures_with_month_names1
+
+    return render(request, 'factures.html', context)
 
 @login_required(login_url='login')
 def addnew(request):
@@ -60,9 +91,7 @@ def update_facture(request, id):
             factures.save()
 
    
-            # Redirection avec les paramètres year et month
-            date_obj = factures.date
-            return redirect(f"{reverse('factures')}?date={date_obj}")
+            return redirect(f"{reverse('factures')}")
         except Exception as e:
             # En cas d'erreur, rediriger avec les paramètres year et month
 

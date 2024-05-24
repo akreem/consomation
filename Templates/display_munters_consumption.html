@@ -1,71 +1,114 @@
-
 {% extends 'base.html' %}
-
+{% block title %}Consommation Journalière de Munters{% endblock %}
 {% block content %}
-<section class="section" >
+
+<!-- Formulaire de filtrage par mois et année -->
+<section class="section">
     <div class="row">
-        <div class="col-lg-9">
-
-            <h3 class="card-title">Consommation MUNTERS par rapport compteur général </h3>
-            <div class="card">
-                <table class="table table-bordered border-primary">
-                    <thead>
-                        <tr>
-                            <th scope="col">Mois</th>
-                            <th scope="col">Année</th>                            
-                            <th scope="col">Consommation électrique </th>
-                            <th scope="col">Consommation MUNTERS</th>
-                            <th scope="col">Facture STEG DTTTC</th>
-                            <th scope="col"> Cout électricité Munters DTTTC</th>
-                            <th scope="col">Action</th>
-
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for consumption in munters_consumptions %}
-                        <tr>
-                            <td>{{ consumption.month }}</td>
-
-                            <td>{{ consumption.year }}</td>
-                            <td>{{ consumption.elec_consumption }}</td>
-                            <td>{{ consumption.munters_consumption }}</td>
-                            <td>{{ consumption.facture_DTTC }}</td>
-                            <td>{{ consumption.elec_munters_DTTC }}</td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
-                                data-id="{{ consumption.id }}"
-                                data-year="{{ consumption.year}}"
-                                data-month="{{ consumption.month}}"
-                                data-elec_consumption="{{ consumption.elec_consumption }}"
-                                data-munters_consumption="{{ consumption.munters_consumption }}"
-                                data-facture="{{consumption.facture_DTTC}}"
-                                data-elec_munters="{{consumption.elec_munters_DTTC}}">
-                                <i class="bi bi-pencil"></i>
-
-                        </button>
-
-                                <form action="{% url 'delete_munters_monthly' consumption.id %}" method="post" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                    <input type="hidden" id="year" name="year" value="{{ consumption.year}}">
-                                    <input type="hidden" id="month" name="month" value="{{ consumption.month}}">
-
-                                </form>
-
-                                
-                            </td>
-                        </tr>
-                        {% endfor %}
-                
-                    </tbody>
-                </table>
-            </div>
+        <div class="col-lg-12">
+            <form method="get" action="{% url 'show_munters' %}">
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                        <label for="year" class="sr-only">Année</label>
+                        <input type="number" id="year" name="year" class="form-control mb-2" placeholder="Année" min="2000" max="2100" required>
+                    </div>
+                    <div class="col-auto">
+                        <label for="month" class="sr-only">Mois</label>
+                        <select id="month" name="month" class="form-control mb-2" required>
+                            <option value="">Sélectionnez un mois</option>
+                            <option value="1">Janvier</option>
+                            <option value="2">Février</option>
+                            <option value="3">Mars</option>
+                            <option value="4">Avril</option>
+                            <option value="5">Mai</option>
+                            <option value="6">Juin</option>
+                            <option value="7">Juillet</option>
+                            <option value="8">Août</option>
+                            <option value="9">Septembre</option>
+                            <option value="10">Octobre</option>
+                            <option value="11">Novembre</option>
+                            <option value="12">Décembre</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
+                        {% if isfilter %}<a href="{% url "show_munters" %}" type="submit" class="btn btn-info mb-2">Afficher tous</a>{% endif %}
+                        
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </section>
+
+<!-- Section pour afficher les données mensuelles -->
+<section class="section">
+    {% if munters_consumptions %}
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="card-title">{% if isfilter %}Consommation de Munters pour le mois sélectionné {% endif %}</h3>
+                <div class="card">
+                    <table class="table table-bordered border-primary">
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Relevé du Compteur</th>
+                                <th scope="col">Consommation Journalière</th>
+                                <th scope="col">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consumption in munters_consumptions %}
+                            <tr>
+                                <td>{{ consumption.date|date:"d/m/Y" }}</td>
+                                <td>{{ consumption.meter_reading }}</td>
+                                <td>{% if consumption.daily_consumption != 0 %}{{ consumption.daily_consumption }}{% endif %}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editModal"
+                                        data-id="{{ consumption.id }}"
+                                        data-meter_reading="{{ consumption.meter_reading }}"
+                                        data-daily_consumption="{{ consumption.daily_consumption }}"
+                                        data-date="{{ consumption.date|date:'Y-m-d' }}"
+                                        >
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form action="{% url 'delete_munters' consumption.id %}" method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <input type="hidden" name="consumption_date" value="{{ consumption.date|date:'Y-m-d' }}">
+                                    </form>
+                                    
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="2"><strong>Consommation {% if isfilter %}Mensuelle{% endif %} Totale</strong></td>
+                                <td><strong>{{ monthly_consumption }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    {% if isfilter %}<a href="/export_xl_munters_filtered/{{year}}/{{month}}/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
+                    {% if not isfilter %}<a href="/export_xl_munters/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
+                </div>
+                
+            </div>
+            
+            
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Aucune donnée à afficher.</p>
+                <!--<p>Aucune donnée à afficher. Veuillez sélectionner un mois et une année pour filtrer les résultats.</p>-->
+            </div>
+        </div>
+    {% endif %}
+</section>
+<!-- Modal pour la modification -->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -80,28 +123,15 @@
                 <div class="modal-body">
                     <input type="hidden" name="consumption_id" id="consumptionId" value="">
                     <div class="form-group">
-                        <label for="elec_consumption">Conso Electricité</label>
-                        <input type="number" step="any" class="form-control" id="elec_consumption" name="elec_consumption" required>
+                        <label for="meter_reading">Relevé du Compteur</label>
+                        <input type="number" class="form-control" id="meter_reading" name="meter_reading" required>
                     </div>
                     <div class="form-group">
-                        <label for="munters_consumption">Conso MUNTERS</label>
-                        <input type="number" step="any" class="form-control" id="munters_consumption" name="munters_consumption" >
-                    </div>
-                    <div class="form-group">
-                        <label for="facture_DTTC">Facture  DTTC</label>
-                        <input type="number" step="any" class="form-control" id="facture_DTTC" name="facture_DTTC" >
-                    </div>
-                    <div class="form-group">
-                        <label for="elec_munters_DTTC">Munters DTTC</label>
-                        <input type="number" step="any" class="form-control" id="elec_munters_DTTC" name="elec_munters_DTTC" >
-                    </div> 
-              
-          
-                    <div class="form-group" style="display:hidden;">
-                        <input type="hidden" name="year" id ="year" class="form-control" >
+                        <label for="daily_consumption">Consommation Journalière</label>
+                        <input type="number" class="form-control" id="daily_consumption" name="daily_consumption" required>
                     </div>
                     <div class="form-group" style="display:hidden;">
-                        <input type="hidden" name="month" id ="month" class="form-control" >
+                        <input type="hidden" name="date" id ="date" class="form-control" >
                     </div>
 
                 </div>
@@ -119,23 +149,17 @@
     $('#editModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         var id = button.data('id') // Extract info from data-* attributes
-        var elec_consumption = button.data('elec_consumption')
-        var munters_consumption = button.data('munters_consumption')
-        var facture_DTTC = button.data('facture')
-        var elec_munters_DTTC = button.data('elec_munters')
-        var month = button.data('month')
-        var year = button.data('year')
+        var meter_reading = button.data('meter_reading')
+        var daily_consumption = button.data('daily_consumption')
+        var date_consumption = button.data('date')
     
         var modal = $(this)
         modal.find('.modal-body #consumptionId').val(id)
-        modal.find('.modal-body #elec_consumption').val(elec_consumption)
-        modal.find('.modal-body #munters_consumption').val(munters_consumption)
-        modal.find('.modal-body #facture_DTTC').val(facture_DTTC)
-        modal.find('.modal-body #elec_munters_DTTC').val(elec_munters_DTTC)
-        modal.find('.modal-body #month').val(month)
-        modal.find('.modal-body #year').val(year)
+        modal.find('.modal-body #meter_reading').val(meter_reading)
+        modal.find('.modal-body #daily_consumption').val(daily_consumption)
+        modal.find('.modal-body #date').val(date_consumption)
 
-        modal.find('#editForm').attr('action', 'modify_munters_monthly/' + id+ '/');
+        modal.find('#editForm').attr('action', 'modify_water/' + id+ '/');
     })
     </script>
     

@@ -10,28 +10,32 @@ class Facture(models.Model):
         ('electricite', 'Électricité'),
     )
     typecompt_CHOICES = (
-        ('Compteur poignee', 'Compteur poignee'),
-        ('Compteur sanitaire', 'Compteur sanitaire'),
+        ("Type station d'eau", "Type station d'eau"),
+        ("Type sanitaire", "Type sanitaire"),
+    )
+    typecompte_CHOICES = (
+        ('Compteur général', 'Compteur général'),
+        ('Munters', 'Munters'),
     )
     months_CHOICES = (
-        ('Janvier','Janvier'),
-        ('Février','Février'),
-        ('Mars','Mars'),
-        ('Avril','Avril'),
-        ('Mai','Mai'),
-        ('Juin','Juin'),
-        ('Juillet','Juillet'),
-        ('Aout','Aout'),
-        ('Septembre','Septembre'),
-        ('Octobre','Octobre'),
-        ('Novembre','Novembre'),
-        ('Décembre','Décembre')
+        (1,'Janvier'),
+        (2,'Février'),
+        (3,'Mars'),
+        (4,'Avril'),
+        (5,'Mai'),
+        (6,'Juin'),
+        (7,'Juillet'),
+        (8,'Aout'),
+        (9,'Septembre'),
+        (10,'Octobre'),
+        (11,'Novembre'),
+        (12,'Décembre')
     )
     utility_type = models.CharField(max_length=20, choices=UTILITY_CHOICES)
-    date = models.DateField()
-    mois = models.CharField(max_length=20, choices=months_CHOICES)
+    mois = models.IntegerField(choices=months_CHOICES)
     annee = models.IntegerField(null=True)
     typecompteur_eau = models.CharField(max_length=20, choices=typecompt_CHOICES, blank=True, null=True)
+    typecompteur_elect = models.CharField(max_length=20, choices=typecompte_CHOICES, blank=True, null=True)
     consumption = models.FloatField()
     pu = models.FloatField()
     cos = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)

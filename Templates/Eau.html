@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
+{% block title %}Ajouter une consommation d'eau{% endblock %}
 
 {% block content %}
 
+<div class="container">
+  <h2 style="text-align: center;">Ajouter une consommation d'eau</h2>
+  <br>
 <form method="post" action="{% url 'add_water_consumption' %}">
     {% csrf_token %}
     <div class="row mb-3">
@@ -12,10 +16,11 @@
     </div>
     <div class="row mb-3">
         <label for="meter_reading" class="col-sm-2 col-form-label">Lecture Compteur</label>
-        <div class="col-sm-10">
-            <input type="number" class="form-control" id="meter_reading" name="meter_reading" required>
+        <div class="col-sm-10 input-group mb-3">
+            <input type="number" class="form-control" id="meter_reading" name="meter_reading" aria-describedby="basic-addon2" required>
+            <span class="input-group-text" id="basic-addon2">m³</span>
         </div>
-    </div>
+    </div>    
 
     <div class="row mb-3">
         <div class="col-sm-10 offset-sm-2">
@@ -33,6 +38,7 @@
   {% endfor %}
 {% endif %}
 </form>
+</div>
 
 
 {% endblock %}

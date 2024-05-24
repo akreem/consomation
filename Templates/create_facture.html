@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Ajouter une facture{% endblock %}
 {% block content %}
 <style>
     .hidden {
@@ -47,19 +48,30 @@
         console.log("Document ready!"); // Check if document ready event fires
         
         const utility_type = $("[name='utility_type']");
+
+
         const typecompteur_eau = $("[name='typecompteur_eau']");
+        const typecompteur_eauLabel = $("[for='id_typecompteur_eau']");
+
         const cos = $("[name='cos']");
         const coslabel = $("[for='id_cos']");
 
-        const typecompteur_eauLabel = $("[for='id_typecompteur_eau']");
+        
+
+        const typecompteur_elect = $("[name='typecompteur_elect']");
+        const typecompteur_electLabel = $("[for='id_typecompteur_elect']");
 
         console.log("Utility Type:", utility_type);
         console.log("Type Compteur Eau:", typecompteur_eau);
 
         typecompteur_eauLabel.addClass('hidden');
         typecompteur_eau.addClass('hidden');
+
         cos.addClass('hidden');
         coslabel.addClass('hidden');
+
+        typecompteur_electLabel.addClass('hidden');
+        typecompteur_elect.addClass('hidden');
         
         utility_type.on('change', function() {
             console.log("Utility Type changed:", this.value);
@@ -68,23 +80,36 @@
                 
                 cos.removeClass('hidden');
                 coslabel.removeClass('hidden');
+                typecompteur_elect.removeClass('hidden');
+                typecompteur_electLabel.removeClass('hidden');
+
+                typecompteur_eauLabel.addClass('hidden');
+                typecompteur_eau.addClass('hidden');
+
             } 
             else if (this.value === "eau") {
                 typecompteur_eauLabel.removeClass('hidden');
                 typecompteur_eau.removeClass('hidden');
+
+                cos.addClass('hidden');
+                coslabel.addClass('hidden');
+                typecompteur_elect.addClass('hidden');
+                typecompteur_electLabel.addClass('hidden');
             }
             else {
                 typecompteur_eauLabel.addClass('hidden');
                 typecompteur_eau.addClass('hidden');
                 cos.addClass('hidden');
                 coslabel.addClass('hidden');
+                typecompteur_elect.addClass('hidden');
+                typecompteur_electLabel.addClass('hidden');
             }
         });
     });
 
 </script>
 <div class="container">
-    <h2>Créer une Facture</h2>
+    <h2>Ajouter une facture</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}

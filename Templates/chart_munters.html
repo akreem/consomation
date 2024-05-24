@@ -1,115 +1,106 @@
-
-
 {% extends 'base.html' %}
-
+{% block title %}Consommation Journalier de Munters {% endblock %}
 {% block content %}
-<section class="section" >
+<section class="section">
 
-    <h1 class="me-2">Consomation MUNTERS par rapport consommation général</h1>
 
-    <canvas id="muntersChart" width="700" height="200"></canvas>
-    <h1 class="ms-2">Facture MUNTERS par rapport facture général</h1>
+    <h1>Consommation Journalier de Munters</h1>
+    <div class="mt-1">
+        <form id="dataForm" class="bg-light p-2 rounded" method="post">
+            {% csrf_token %}
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-6">
+                    <label for="month">Month:</label>
+                    <select id="month" name="month" class="form-control" required>
+                        <option value="1">Janvier</option>
+                        <option value="2">Février</option>
+                        <option value="3">Mars</option>
+                        <option value="4">Avril</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juin</option>
+                        <option value="7">Juillet</option>
+                        <option value="8">Aout</option>
+                        <option value="9">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="year">Year:</label>
+                    <input type="number" value=2024 id="year" name="year" min="2000" max="2100" step="1"
+                        class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="mt-2 btn btn-primary">Générer Carte</button>
+        </form>
+    </div>
+    <canvas id="waterChart" width="700" height="280"></canvas>
 
-    <canvas id="factureChart" width="700" height="200"></canvas>
-    
+
+
     <script>
-        var months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        var data = [
-            {% for item in data %}
-            {
-                month: months[{{ item.month }}] + ' {{ item.year }}',
-                elec_consumption: {{ item.elec_consumption }},
-                munters_consumption: {{ item.munters_consumption }},
-                facture_DTTC: {{ item.facture_DTTC }},
-                elec_munters_DTTC: {{ item.elec_munters_DTTC }}
-            },
-            {% endfor %}
-        ];
-    
-        // Graphique Munters / Elec
-        var muntersChart = new Chart(document.getElementById('muntersChart'), {
-            type: 'bar',
-            data: {
-                labels: data.map(function(item) {
-                    return item.month;
-                }),
-                datasets: [{
-                    label: 'Munters Consumption',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    data: data.map(function(item) {
-                        return item.munters_consumption;
-                    })
-                },
-                {
-                    label: 'Electric Consumption',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                    data: data.map(function(item) {
-                        return item.elec_consumption;
-                    })
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Montant (DT)'  // Label pour l'axe Y
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Mois'  // Label pour l'axe X
-                        }
+
+        const form = document.getElementById('dataForm');
+
+        const canvas = document.getElementById('waterChart').getContext('2d');
+        let waterChart;
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/monthly_munters_chart/', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (waterChart) {
+                        waterChart.destroy();
                     }
-                }
-            }
-        });
-    
-        // Graphique Facture / Elec_Munters
-        var factureChart = new Chart(document.getElementById('factureChart'), {
-            type: 'bar',
-            data: {
-                labels: data.map(function(item) {
-                    return item.month;
-                }),
-                datasets: [{
-                    label: 'Facture DTTC',
-                    backgroundColor: 'rgba(255, 206, 86, 0.6)',
-                    data: data.map(function(item) {
-                        return item.facture_DTTC;
-                    })
-                },
-                {
-                    label: 'Electric Munters DTTC',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    data: data.map(function(item) {
-                        return item.elec_munters_DTTC;
-                    })
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Montant (DT)'  // Label pour l'axe Y
+                    waterChart = new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Consommation journalière',
+                                data: data.daily_consumptions,
+                                fill: false,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Consommation (m³)'  // Label pour l'axe Y
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Jour'  // Label pour l'axe X
+                                    }
+                                }
+                            }
                         }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Mois'  // Label pour l'axe X
-                        }
-                    }
-                }
-            }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         });
     </script>
-    
-    
+    <!-- End Bar Chart -->
+
+    </div>
+    </div>
+    </div>
+
+
 
 
 </section>

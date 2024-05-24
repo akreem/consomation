@@ -7,7 +7,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   
 
-  <title>Tableau du bord</title>
+  <title>{% block title %} {% endblock %}</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -49,7 +49,7 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="/Home" class="logo d-flex align-items-center">
+      <a href="/" class="logo d-flex align-items-center">
         <img src="{% static 'assets/img/logo.png'%}" alt="">
         <span class="d-none d-lg-block">Consomation</span>
       </a>
@@ -79,8 +79,8 @@
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
-              <h6>{{name}}</h6>
-              <span>{{role}}</span>
+            <span >Bienvenu {{request.user.username}}</span>
+
             </li>
             <li>
               <hr class="dropdown-divider">
@@ -126,76 +126,64 @@
         </a>
         <ul id="dashboard-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/Home">
+            <a href="/">
               <i class="bi bi-grid"></i><span>Accueil</span>
             </a>
           </li>
           <li>
             <a href="/add_water_consumption" >
-              <i class="bi bi-grid"></i><span>Ajouter consommation Eau</span>
+              <i class="bi bi-grid"></i><span>Eau</span>
             </a>
-            <!--<ul>
+            <ul>
               <li> 
                 <a href="/add_water_consumption">
-                  <i class="bi bi-circle"></i><span>Journalier</span>
+                  <i class="bi bi-circle"></i><span>Ajouter consommation</span>
                 </a>
               </li>
-              <li>
-                <a href="/add_water_monthly_consumption">
-                  <i class="bi bi-circle"></i><span>Mensuelle </span>
-                </a>
-              </li>
-            </ul>-->
+
+            </ul>
           </li>
           <li>
-            <a href="/add_gas_consumption">
-              <i class="bi bi-grid"></i><span>Ajouter consommation Gaz</span>
+            <a href="#">
+              <i class="bi bi-grid"></i><span>Gaz</span>
             </a>
-            <!--<ul>
+            <ul>
               <li>
                 <a href="/add_gas_consumption">
-                  <i class="bi bi-circle"></i><span>Journalier</span>
+                  <i class="bi bi-circle"></i><span>Ajouter consommation</span>
                 </a>
               </li>
-              <li>
-                <a href="/add_gas_monthly_consumption">
-                  <i class="bi bi-circle"></i><span>Mensuelle </span>
-                </a>
-              </li>
-            </ul>-->
+
+            </ul>
           </li>
           <li>
-            <a href="/add_Energy_consumption">
-              <i class="bi bi-grid"></i><span>Ajouter consommation electricité</span>
+            <a href="#">
+              <i class="bi bi-grid"></i><span>Electricité</span>
             </a>
-            <!--<ul>
+            <ul>
               <li>
                 <a href="/add_Energy_consumption">
-                  <i class="bi bi-circle"></i><span>Journalier</span>
+                  <i class="bi bi-circle"></i><span>Ajouter consommation</span>
                 </a>
               </li>
-           <li>
-                <a href="/add_energy_monthly_consumption">
-                  <i class="bi bi-circle"></i><span>Mensuelle</span>
-                </a>
-              </li>
-            </ul>-->
+
+            </ul>
           </li>
         
           <li>
             <a href="#">
-              <i class="bi bi-grid"></i><span>Ajouter consommation MUNTERS</span>
+              <i class="bi bi-grid"></i><span>MUNTERS</span>
             </a>
             <ul>
               <li>
                 <a href="/add_munters_consumption">
-                  <i class="bi bi-circle"></i><span>Mensuelle</span>
+                  <i class="bi bi-circle"></i><span>Ajouter consommation</span>
                 </a>
               </li>
             
             </ul>
           </li>
-          <li >
+          <li>
             <a href="#">
              <i class="bi bi-grid"></i><span>Machines</span>
             </a>
@@ -245,55 +233,55 @@
         </a>
         <ul id="table-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="/show_water">
+            <a href="#">
               <i class="bi bi-grid"></i><span>Afficher consommation Eau</span>
             </a>
-            <!--<ul>
+            <ul>
               <li>
                 <a href="/show_water">
                   <i class="bi bi-circle"></i><span> Journalier </span>
                 </a>
               </li>
               <li>
-                <a href="/show_monthly_water">
+                <a href="/water_monthly_consumption">
                   <i class="bi bi-circle"></i><span> Mensuelle</span>
                 </a>
               </li>
-            </ul>-->
+            </ul>
           </li>
           <li>
-            <a href="/show_Gas">
+            <a href="#">
               <i class="bi bi-grid"></i><span>Afficher consommation Gaz</span>
             </a>
-            <!--<ul>
+            <ul>
               <li>
                 <a href="/show_Gas">
                   <i class="bi bi-circle"></i><span> Journalier </span>
                 </a>
               </li>
               <li>
-                <a href="/show_monthly_gas">
+                <a href="/gaz_monthly_consumption">
                   <i class="bi bi-circle"></i><span> Mensuelle</span>
                 </a>
               </li>
-            </ul>-->
+            </ul>
           </li>
           <li>
-            <a href="/show_Energy">
+            <a href="#">
               <i class="bi bi-grid"></i><span>Afficher consommation Electricité</span>
             </a>
-            <!--<ul>
+            <ul>
               <li>
-                <a href="#">
+                <a href="/show_Energy">
                   <i class="bi bi-circle"></i><span> Journalier </span>
                 </a>
               </li>
               <li>
-                <a href="/show_monthly_energy">
+                <a href="/energy_monthly_consumption">
                   <i class="bi bi-circle"></i><span> Mensuelle </span>
                 </a>
               </li>
-            </ul>-->
+            </ul>
           </li>
           <li>
             <a href="#">
@@ -301,16 +289,22 @@
             </a>
             <ul>
               <li>
-                <a href="/show_munters_elec">
-                  <i class="bi bi-circle"></i><span> Mensuelle </span>
+                <a href="/show_munters/">
+                  <i class="bi bi-circle"></i><span>Journalier</span>
                 </a>
               </li>
-  
+
+              <li>
+                <a href="/munters_monthly_consumption">
+                  <i class="bi bi-circle"></i><span>Mensuelle</span>
+                </a>
+              </li>
+
             </ul>
           </li>
           <li>
             <a href="/show_machines">
-              <i class="bi bi-grid"></i><span>Afficher machines</span>
+              <i class="bi bi-grid"></i><span>Afficher Machines</span>
             </a>
           </li>
           <li>
@@ -342,15 +336,15 @@
                 </a>
               </li>
               <li>
-                <a href="/water_consumption_monthly_chart">
+                <a href="/water_mconsumption_chart">
                   <i class="bi bi-circle"></i><span>Mensuelle</span>
                 </a>
               </li>
-              <li>
+              <!--<li>
                 <a href="/water_anual_compare_chart">
                   <i class="bi bi-circle"></i><span>Comparaison annuelle</span>
                 </a>
-              </li>
+              </li>-->
             </ul>
           </li>
           <li>
@@ -364,15 +358,15 @@
                 </a>
               </li>
               <li>
-                <a href="/gas_consumption_monthly_chart">
+                <a href="/gas_mconsumption_chart">
                   <i class="bi bi-circle"></i><span>Mensuelle</span>
                 </a>
               </li>
-              <li>
+              <!--<li>
                 <a href="/gas_anual_compare_chart">
                   <i class="bi bi-circle"></i><span>Comparaison annuelle</span>
                 </a>
-              </li>
+              </li>-->
             </ul>
           </li>
           <li>
@@ -386,21 +380,34 @@
                 </a>
               </li>
               <li>
-                <a href="/energy_consumption_monthly_chart">
+                <a href="/energy_mconsumption_chart">
                   <i class="bi bi-circle"></i><span>Mensuelle</span>
                 </a>
               </li>
-              <li>
+              <!--<li>
                 <a href="/energy_anual_compare_chart">
                   <i class="bi bi-circle"></i><span>Comparaison annuelle</span>
                 </a>
-              </li>
+              </li>-->
             </ul>
           </li>
           <li>
-            <a href="/munters_chart">
+          <li>
+            <a href="#">
               <i class="bi bi-grid"></i><span>Graphiques Munters</span>
             </a>
+            <ul lass="nav-content">
+              <li>
+                <a href="/munters_consumption_chart">
+                  <i class="bi bi-circle"></i><span>Journalier</span>
+                </a>
+              </li>
+              <li>
+                <a href="/munters_mconsumption_chart">
+                  <i class="bi bi-circle"></i><span>Mensuelle</span>
+                </a>
+              </li>
+            </ul>
           </li>
         </ul>
       </li><!-- End Charts Nav -->

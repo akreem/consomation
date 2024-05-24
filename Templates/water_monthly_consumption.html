@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Consommation Mensuelle d'eau{% endblock %}
+{% block content %}
+  <h2 style="text-align: center;">Consommation Mensuelle d'eau</h2>
+  <br>
+<!-- Formulaire de filtrage par mois et année -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <form method="get" action="{% url 'water_monthly_consumption' %}">
+                <div class="form-row align-items-center">
+                    <div class="col-auto">
+                        <label for="year" class="sr-only">Année</label>
+                        <input type="number" id="year" name="year" class="form-control mb-2" placeholder="Année" min="2000" max="2100" required>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary mb-2">Filtrer</button>
+                        {% if isfilter %}<a href="{% url "water_monthly_consumption" %}" type="submit" class="btn btn-info mb-2">Afficher tous</a>{% endif %}
+                        
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<section class="section">
+    {% if monthly_data %}
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="card-title">
+                    {% if isfilter %}
+                    Consommation d'eau totale par Mois pour l'année 
+                        {% for key, value in request.GET.items %}
+                            {{value}}
+                        {% endfor %}
+                    {% endif %}</h3>
+                <div class="card">
+                    <table class="table table-bordered border-primary">
+                        <thead>
+                            <tr>
+                                <th scope="col">Mois</th>
+                                <th scope="col">Consommation Mensuelle Totale (m³)</th>
+                                <th scope="col">Compteur du mois (m³)</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in monthly_data %}
+                            <tr>
+                                <td>{{ entry.month|date:"F Y" }}</td>
+                                <td>{{ entry.total_consumption }}</td>
+                                <td>{{ entry.max_compteur }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if isfilter %}<a href="/export_monthly_water_f/{{year}}" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
+                    {% if not isfilter %}<a href="/export_monthly_water/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
+                </div>
+                
+            </div>
+            
+            
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Aucune donnée à afficher.</p>
+                <!--<p>Aucune donnée à afficher. Veuillez sélectionner un mois et une année pour filtrer les résultats.</p>-->
+            </div>
+        </div>
+    {% endif %}
+</section>
+
+
+    
+{% endblock %}
+

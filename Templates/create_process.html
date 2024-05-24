@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% block title %}Ajouter une Process{% endblock %}
+
 {% block content %}
 <style>
     .hidden {
@@ -41,7 +43,8 @@
 </style>
 
 <div class="container">
-    <h2>Créer une Process</h2>
+    <h2 style="text-align: center;">Ajouter une Process</h2>
+    
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

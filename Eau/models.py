@@ -27,14 +27,11 @@ class EnergyMonthlyConsumption(models.Model):
     new_meter = models.IntegerField()
     prix_u_old = models.FloatField()
 
+class MuntersConsumption(models.Model):
+    date = models.DateField()
+    meter_reading = models.IntegerField()
+    daily_consumption = models.IntegerField()
 
-class Munters(models.Model):
-    month = models.IntegerField()
-    year = models.IntegerField()
-    elec_consumption = models.FloatField()
-    munters_consumption = models.FloatField()
-    facture_DTTC = models.FloatField()
-    elec_munters_DTTC = models.FloatField()
     
 class Machines(models.Model):
     nom = models.TextField()

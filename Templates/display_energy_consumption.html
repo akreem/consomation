@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
-
+{% block title %}Consommation d'électricité{% endblock %}
 {% block content %}
+
+
+  <h2 style="text-align: center;">Consommation Journalière d'électricité</h2>
+  <br>
 
 <!-- Formulaire de filtrage par mois et année -->
 <section class="section">
@@ -52,8 +56,8 @@
                         <thead>
                             <tr>
                                 <th scope="col">Date</th>
-                                <th scope="col">Relevé du Compteur</th>
-                                <th scope="col">Consommation Journalière</th>
+                                <th scope="col">Relevé du Compteur (kWh)</th>
+                                <th scope="col">Consommation Journalière (kWh)</th>
                                 <th scope="col">Action</th>
 
                             </tr>
@@ -90,6 +94,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    {% if isfilter %}<a href="/export_energy_filtered/{{year}}/{{month}}/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
                     {% if not isfilter %}<a href="{% url "export_xl_energy" %}" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
                 </div>
                 

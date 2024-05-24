@@ -4,7 +4,7 @@ from .models import Facture, ProcessClass
 class FactureForm(forms.ModelForm):
     class Meta:
         model = Facture
-        fields = ['utility_type','typecompteur_eau','date','mois','annee','consumption','pu','cos','montant']
+        fields = ['utility_type','typecompteur_eau','typecompteur_elect','mois','annee','consumption','pu','cos','montant']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -15,7 +15,9 @@ class FactureForm(forms.ModelForm):
         self.fields['utility_type'].label = "Utilitaire"
         self.fields['typecompteur_eau'].widget.attrs.update({'class': 'form-control', 'placeholder':'Nom'})
         self.fields['typecompteur_eau'].label = "Type de compteur d'eau "
-        self.fields['date'].widget.attrs.update({'class': 'form-control'})
+
+        self.fields['typecompteur_elect'].widget.attrs.update({'class': 'form-control', 'placeholder':'Nom'})
+        self.fields['typecompteur_elect'].label = "Type de compteur d'electricitè "
 
         self.fields['mois'].widget.attrs.update({'class': 'form-control', 'placeholder':'Mois'})
         self.fields['mois'].label = "Mois"
@@ -26,8 +28,8 @@ class FactureForm(forms.ModelForm):
         self.fields['pu'].widget.attrs.update({'class': 'form-control', 'placeholder':'Prix Unitaire'})
         self.fields['pu'].label = "Prix Unitaire"
 
-        self.fields['cos'].widget.attrs.update({'class': 'form-control', 'placeholder':'Cos Q'})
-        self.fields['cos'].label = "Cos Q"
+        self.fields['cos'].widget.attrs.update({'class': 'form-control', 'placeholder':'Cos Y'})
+        self.fields['cos'].label = "Cos Y"
 
         self.fields['montant'].widget.attrs.update({'class': 'form-control', 'placeholder':'Montant'})
 

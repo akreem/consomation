@@ -1,11 +1,12 @@
 
 {% extends 'base.html' %}
+{% block title %}Graphique de consommation journalière de gaz{% endblock %}
 
 {% block content %}
 <section class="section" >
    
 
-    <h1>Consommation Journelier du gaz</h1>
+    <h1>Graphique de consommation journalière de gaz</h1>
     <div class="mt-1">
         <form id="dataForm" class="bg-light p-2 rounded" method="post" >
             {% csrf_token %}
@@ -29,7 +30,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label for="year">Year:</label>
-                    <input type="number" id="year" name="year" min="2000" max="2100" step="1" class="form-control" required>
+                    <input type="number" id="year" value=2024 name="year" min="2000" max="2100" step="1" class="form-control" required>
                 </div>
             </div>
             <button type="submit" class="mt-2 btn btn-primary">Générer Carte</button>

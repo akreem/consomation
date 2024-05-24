@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
-
+{% block title %}Consommation Journalière d'eau{% endblock %}
 {% block content %}
+
+
+  <h2 style="text-align: center;">Consommation Journalière d'eau</h2>
+  <br>
 
 <!-- Formulaire de filtrage par mois et année -->
 <section class="section">
@@ -52,8 +56,8 @@
                         <thead>
                             <tr>
                                 <th scope="col">Date</th>
-                                <th scope="col">Relevé du Compteur</th>
-                                <th scope="col">Consommation Journalière</th>
+                                <th scope="col">Relevé du Compteur (m³)</th>
+                                <th scope="col">Consommation Journalière (m³)</th>
                                 <th scope="col">Action</th>
 
                             </tr>
@@ -90,6 +94,8 @@
                             </tr>
                         </tbody>
                     </table>
+
+                    {% if isfilter %}<a href="/export_water_filtered/{{year}}/{{month}}/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
                     {% if not isfilter %}<a href="/export_water/" type="submit" class="btn btn-success mb-2">Export Excel</a>{% endif %}
                 </div>
                 
